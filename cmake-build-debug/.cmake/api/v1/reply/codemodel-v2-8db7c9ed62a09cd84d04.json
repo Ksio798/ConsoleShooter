@@ -49,8 +49,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "A:/ProjectsC++/ConsoleShooter/cmake-build-debug",
-		"source" : "A:/ProjectsC++/ConsoleShooter"
+		"build" : "C:/Users/ptash/CLionProjects/ConsoleShooter/cmake-build-debug",
+		"source" : "C:/Users/ptash/CLionProjects/ConsoleShooter"
 	},
 	"version" : 
 	{

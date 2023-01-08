@@ -138,7 +138,8 @@ void minMap() {
 }
 
 int main() {
-    Console = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, NULL, CONSOLE_TEXTMODE_BUFFER, NULL);
+    Console = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0,
+                                        NULL, CONSOLE_TEXTMODE_BUFFER, NULL);
     SetConsoleActiveScreenBuffer(Console);
     DWORD dwBytesWritten = 0;
 
@@ -160,7 +161,8 @@ int main() {
         minMap();//отрисовка миникарты
 
         screen[ScreenWidth * ScreenHeight - 1] = '\0';
-        WriteConsoleOutputCharacter(Console, reinterpret_cast<LPCSTR>(screen), ScreenWidth * ScreenHeight, {0, 0},
+        WriteConsoleOutputCharacter(Console, reinterpret_cast<LPCSTR>(screen),
+                                    ScreenWidth * ScreenHeight, {0, 0},
                                     &dwBytesWritten);
     }
 }
