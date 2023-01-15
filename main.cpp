@@ -4,19 +4,65 @@
 #include <cmath>
 #include <vector>
 #include <algorithm>
+#include <deque>
+
+class Timer {
+    std::chrono::system_clock::time_point tp1 = std::chrono::system_clock::now();
+    std::chrono::system_clock::time_point tp2 = std::chrono::system_clock::now();
+    bool *changingVar;
+public:
+    bool isStarted = false;
+    int count;
+public:
+    void start(int c, bool *adds) {
+        count = c;
+        changingVar = adds;
+        tp1 = std::chrono::system_clock::now();
+        isStarted = true;
+    }
+
+    void update() {
+        if (isStarted) {
+            tp2 = std::chrono::system_clock::now();
+            std::chrono::duration<float> duration = tp2 - tp1;
+            if (duration.count() == count) {
+                isStarted = false;
+                if (changingVar != NULL)
+                    *changingVar = true;
+            }
+        }
+    }
+
+    void stop() {
+        isStarted = false;
+        count = 0;
+        if (changingVar != NULL)
+            *changingVar = false;
+    }
+};
 
 int ScreenWidth = 120;
 int ScreenHeight = 40;
 float VectorX = 1.0f;
 float VectorY = 1.0f;
 float VectorA = 0.0f;
-int gameHeight = 16;
-int gameWidth = 16;
+const int gameHeight = 16;
+const int gameWidth = 16;
 float visibilityZone = 3.14159 / 3;
 float visibilityDistance = 30.0f;
 HANDLE Console;
 auto screen = new char[ScreenWidth * ScreenHeight + 1];
-std::string map;
+
+std::string map, code = "QWERT";
+int codeIndex = 0, timeToWait = 5;
+bool isTimeOver = false, isManualControl = true;
+Timer timer;
+char map2[gameWidth][gameHeight];
+std::deque<std::pair<int, int>> previousSteps;
+float targetX = 1.0f;
+float targetY = 1.0f;
+float targetA = 0.0f;
+
 
 void generateMap() {
     map += "################";
@@ -35,6 +81,7 @@ void generateMap() {
     }
     map += "#######...######";
 }
+
 
 void move(float elapsedTime) {
     if (GetAsyncKeyState((int) 'A'))
@@ -137,13 +184,103 @@ void minMap() {
     screen[((int) VectorX + 1) * ScreenWidth + (int) VectorY] = 'P';
 }
 
+void findWay() {
+    int currentX = VectorX, currentY = VectorY;
+    map2[currentX][currentY] = '*';
+    previousSteps.clear();
+    previousSteps.push_back(std::make_pair(currentX, currentY));
+    while (true) {
+        std::vector<std::pair<int, int>> ways;
+        if (map2[currentX + 1][currentY] != '*' && map2[currentX + 1][currentY] != '#' && currentX < gameWidth - 1)
+            ways.push_back(std::make_pair(currentX + 1, currentY));
+        if (map2[currentX - 1][currentY] != '*' && map2[currentX - 1][currentY] != '#' && currentX > 0)
+            ways.push_back(std::make_pair(currentX - 1, currentY));
+        if (map2[currentX][currentY + 1] != '*' && map2[currentX][currentY + 1] != '#' && currentY < gameHeight - 1)
+            ways.push_back(std::make_pair(currentX, currentY + 1));
+        if (map2[currentX][currentY - 1] != '*' && map2[currentX][currentY - 1] != '#' && currentY > 0)
+            ways.push_back(std::make_pair(currentX, currentY - 1));
+        if (ways.size() > 0) {
+            auto way = ways.at(rand() % ways.size());
+            currentX = way.first;
+            currentY = way.second;
+            map2[currentX][currentY] = '*';
+            previousSteps.push_back(std::make_pair(currentX, currentY));
+            if (map2[currentX][currentY] == 'W') {
+                break;
+            }
+        } else if(!previousSteps.empty()){
+            auto way = previousSteps.back();
+            previousSteps.pop_back();
+            currentX = way.first;
+            currentY = way.second;
+        }
+    }
+}
+
+void setTarget(){
+    auto target = previousSteps.front();
+    previousSteps.pop_front();
+    targetX = (float)target.first;
+    targetY = (float)target.second;
+    //targetA доделать
+}
+
+void getCode() {
+
+    if (GetAsyncKeyState((int) code[codeIndex])) {
+        codeIndex++;
+        if (!timer.isStarted)
+            timer.start(timeToWait, &isTimeOver);
+        if (codeIndex == code.size()) {
+            codeIndex = 0;
+            isManualControl = false;
+            findWay();
+            setTarget();
+        }
+    }
+    if (isTimeOver) {
+        codeIndex = 0;
+        isTimeOver = false;
+    }
+}
+
+void copyMap() {
+    for (int i = 0; i < gameWidth; ++i) {
+        for (int j = 0; j < gameHeight; ++j) {
+            if (map[j + gameWidth * i] == '#')
+                map2[i][j] = '#';
+            else
+                map2[i][j] = '.';
+        }
+    }
+    map2[gameWidth - 1][gameHeight / 2] = 'W';
+}
+
+void autoMove(float elapsedTime) {
+    if(abs(targetA - VectorA) >= 0.05){
+        VectorA += (1.5f) * elapsedTime;
+    }
+    else{
+        if (abs(targetX - VectorX) >= 0.05 || abs(targetY - VectorY) >= 0.05) {
+            VectorX += sinf(VectorA) * 5.0f * elapsedTime;
+            VectorY += cosf(VectorA) * 5.0f * elapsedTime;
+        } else {
+            setTarget();
+        }
+    }
+
+
+}
+
 int main() {
     Console = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0,
                                         NULL, CONSOLE_TEXTMODE_BUFFER, NULL);
     SetConsoleActiveScreenBuffer(Console);
     DWORD dwBytesWritten = 0;
 
+
     generateMap();
+    copyMap();
 
     auto tp1 = std::chrono::system_clock::now();
     auto tp2 = std::chrono::system_clock::now();
@@ -154,7 +291,13 @@ int main() {
         tp1 = tp2;
         float ElapsedTime = elapsedTime.count();
 
-        move(ElapsedTime);//движение
+        timer.update();
+        getCode();
+
+        if (isManualControl)
+            move(ElapsedTime);//движение
+        else
+            autoMove(ElapsedTime);
 
         rayCasting();
 
