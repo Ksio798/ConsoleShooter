@@ -383,7 +383,12 @@ CMakeFiles/ConsoleShooter.dir/main.cpp.obj: ../main.cpp \
   C:/Program\ Files/JetBrains/CLion\ 2022.2.3/bin/mingw/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/uniform_int_dist.h \
   C:/Program\ Files/JetBrains/CLion\ 2022.2.3/bin/mingw/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/deque \
   C:/Program\ Files/JetBrains/CLion\ 2022.2.3/bin/mingw/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/stl_deque.h \
-  C:/Program\ Files/JetBrains/CLion\ 2022.2.3/bin/mingw/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/deque.tcc
+  C:/Program\ Files/JetBrains/CLion\ 2022.2.3/bin/mingw/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/deque.tcc \
+  C:/Program\ Files/JetBrains/CLion\ 2022.2.3/bin/mingw/x86_64-w64-mingw32/include/conio.h \
+  C:/Program\ Files/JetBrains/CLion\ 2022.2.3/bin/mingw/x86_64-w64-mingw32/include/sec_api/conio_s.h \
+  C:/Program\ Files/JetBrains/CLion\ 2022.2.3/bin/mingw/x86_64-w64-mingw32/include/unistd.h \
+  C:/Program\ Files/JetBrains/CLion\ 2022.2.3/bin/mingw/x86_64-w64-mingw32/include/io.h \
+  C:/Program\ Files/JetBrains/CLion\ 2022.2.3/bin/mingw/x86_64-w64-mingw32/include/getopt.h
 
 
 C:/Program\ Files/JetBrains/CLion\ 2022.2.3/bin/mingw/x86_64-w64-mingw32/include/_mingw_secapi.h:
@@ -430,6 +435,8 @@ C:/Program\ Files/JetBrains/CLion\ 2022.2.3/bin/mingw/lib/gcc/x86_64-w64-mingw32
 
 C:/Program\ Files/JetBrains/CLion\ 2022.2.3/bin/mingw/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/ostream:
 
+C:/Program\ Files/JetBrains/CLion\ 2022.2.3/bin/mingw/x86_64-w64-mingw32/include/io.h:
+
 C:/Program\ Files/JetBrains/CLion\ 2022.2.3/bin/mingw/x86_64-w64-mingw32/include/sec_api/string_s.h:
 
 C:/Program\ Files/JetBrains/CLion\ 2022.2.3/bin/mingw/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/stringfwd.h:
@@ -465,6 +472,8 @@ C:/Program\ Files/JetBrains/CLion\ 2022.2.3/bin/mingw/x86_64-w64-mingw32/include
 C:/Program\ Files/JetBrains/CLion\ 2022.2.3/bin/mingw/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/streambuf.tcc:
 
 C:/Program\ Files/JetBrains/CLion\ 2022.2.3/bin/mingw/x86_64-w64-mingw32/include/_mingw_mac.h:
+
+C:/Program\ Files/JetBrains/CLion\ 2022.2.3/bin/mingw/x86_64-w64-mingw32/include/getopt.h:
 
 C:/Program\ Files/JetBrains/CLion\ 2022.2.3/bin/mingw/x86_64-w64-mingw32/include/jobapi.h:
 
@@ -657,6 +666,8 @@ C:/Program\ Files/JetBrains/CLion\ 2022.2.3/bin/mingw/x86_64-w64-mingw32/include
 C:/Program\ Files/JetBrains/CLion\ 2022.2.3/bin/mingw/x86_64-w64-mingw32/include/pthread_time.h:
 
 C:/Program\ Files/JetBrains/CLion\ 2022.2.3/bin/mingw/x86_64-w64-mingw32/include/pthread_compat.h:
+
+C:/Program\ Files/JetBrains/CLion\ 2022.2.3/bin/mingw/x86_64-w64-mingw32/include/conio.h:
 
 C:/Program\ Files/JetBrains/CLion\ 2022.2.3/bin/mingw/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/x86_64-w64-mingw32/bits/atomic_word.h:
 
@@ -1141,3 +1152,7 @@ C:/Program\ Files/JetBrains/CLion\ 2022.2.3/bin/mingw/lib/gcc/x86_64-w64-mingw32
 C:/Program\ Files/JetBrains/CLion\ 2022.2.3/bin/mingw/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/deque:
 
 C:/Program\ Files/JetBrains/CLion\ 2022.2.3/bin/mingw/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/stl_deque.h:
+
+C:/Program\ Files/JetBrains/CLion\ 2022.2.3/bin/mingw/x86_64-w64-mingw32/include/sec_api/conio_s.h:
+
+C:/Program\ Files/JetBrains/CLion\ 2022.2.3/bin/mingw/x86_64-w64-mingw32/include/unistd.h:

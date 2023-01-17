@@ -5,6 +5,8 @@
 #include <vector>
 #include <algorithm>
 #include <deque>
+#include <conio.h>
+#include <unistd.h>
 
 class Timer {
     std::chrono::system_clock::time_point tp1 = std::chrono::system_clock::now();
@@ -53,16 +55,16 @@ float visibilityDistance = 30.0f;
 HANDLE Console;
 auto screen = new char[ScreenWidth * ScreenHeight + 1];
 
-std::string map, code = "QWERT";
+std::string map, code = "IDDQD";
 int codeIndex = 0, timeToWait = 5;
-bool isTimeOver = false, isManualControl = true;
+bool isTimeOver = false, isManualControl = true, isWin = false;
 Timer timer;
 char map2[gameWidth][gameHeight];
 std::deque<std::pair<int, int>> previousSteps;
 float targetX = 1.0f;
 float targetY = 1.0f;
-float targetA = 0.0f;
-
+float targetA = 1.0f;
+float difference = 0.05f;
 
 void generateMap() {
     map += "################";
@@ -79,9 +81,31 @@ void generateMap() {
         a += "#";
         map += a;
     }
-    map += "#######...######";
+    map += "########W#######";
 }
 
+void generateMap2() {
+    map += "################";
+    map += "#..............#";
+    map += "#######.########";
+    map += "#######.########";
+    map += "#######....#####";
+    map += "##########.#####";
+    map += "##########.#####";
+    map += "#######....#####";
+    map += "####....########";
+    map += "####.###########";
+    map += "####.###########";
+    map += "####.###########";
+    map += "####.....#######";
+    map += "#######..#######";
+    map += "#######...######";
+    map += "########W#######";
+
+
+
+
+}
 
 void move(float elapsedTime) {
     if (GetAsyncKeyState((int) 'A'))
@@ -184,7 +208,21 @@ void minMap() {
     screen[((int) VectorX + 1) * ScreenWidth + (int) VectorY] = 'P';
 }
 
+void copyMap() {
+    for (int i = 0; i < gameWidth; ++i) {
+        for (int j = 0; j < gameHeight; ++j) {
+            if (map[j + gameWidth * i] == '#')
+                map2[i][j] = '#';
+            else if (map[j + gameWidth * i] == '.')
+                map2[i][j] = '.';
+            else
+                map2[i][j] = 'W';
+        }
+    }
+}
+
 void findWay() {
+    copyMap();
     int currentX = VectorX, currentY = VectorY;
     map2[currentX][currentY] = '*';
     previousSteps.clear();
@@ -193,36 +231,66 @@ void findWay() {
         std::vector<std::pair<int, int>> ways;
         if (map2[currentX + 1][currentY] != '*' && map2[currentX + 1][currentY] != '#' && currentX < gameWidth - 1)
             ways.push_back(std::make_pair(currentX + 1, currentY));
-        if (map2[currentX - 1][currentY] != '*' && map2[currentX - 1][currentY] != '#' && currentX > 0)
+        if (map2[currentX - 1][currentY] != '*' && map2[currentX - 1][currentY] != '#' && currentX > 1)
             ways.push_back(std::make_pair(currentX - 1, currentY));
         if (map2[currentX][currentY + 1] != '*' && map2[currentX][currentY + 1] != '#' && currentY < gameHeight - 1)
             ways.push_back(std::make_pair(currentX, currentY + 1));
-        if (map2[currentX][currentY - 1] != '*' && map2[currentX][currentY - 1] != '#' && currentY > 0)
+        if (map2[currentX][currentY - 1] != '*' && map2[currentX][currentY - 1] != '#' && currentY > 1)
             ways.push_back(std::make_pair(currentX, currentY - 1));
+
+        if (map2[currentX + 1][currentY] == 'W') {
+            previousSteps.push_back(std::make_pair(currentX + 1, currentY));
+            break;
+        }
+        if (map2[currentX - 1][currentY] == 'W') {
+            previousSteps.push_back(std::make_pair(currentX - 1, currentY));
+            break;
+        }
+        if (map2[currentX][currentY + 1] == 'W') {
+            previousSteps.push_back(std::make_pair(currentX, currentY + 1));
+            break;
+        }
+        if (map2[currentX][currentY - 1] == 'W') {
+            previousSteps.push_back(std::make_pair(currentX, currentY - 1));
+            break;
+        }
+
         if (ways.size() > 0) {
             auto way = ways.at(rand() % ways.size());
             currentX = way.first;
             currentY = way.second;
-            map2[currentX][currentY] = '*';
             previousSteps.push_back(std::make_pair(currentX, currentY));
             if (map2[currentX][currentY] == 'W') {
                 break;
             }
-        } else if(!previousSteps.empty()){
+            map2[currentX][currentY] = '*';
+        } else if (!previousSteps.empty()) {
             auto way = previousSteps.back();
             previousSteps.pop_back();
             currentX = way.first;
             currentY = way.second;
+        } else {
+            break;
         }
     }
+    previousSteps.pop_front();
 }
 
-void setTarget(){
-    auto target = previousSteps.front();
-    previousSteps.pop_front();
-    targetX = (float)target.first;
-    targetY = (float)target.second;
-    //targetA доделать
+void setTarget() {
+    if (!previousSteps.empty()) {
+        auto target = previousSteps.front();
+        previousSteps.pop_front();
+        targetX = (float) target.first;
+        targetY = (float) target.second;
+        float x = (targetY - VectorY) /
+                  sqrtf((targetX - VectorX) * (targetX - VectorX) + (targetY - VectorY) * (targetY - VectorY));
+        targetA = acos(x);
+    } else {
+        //isManualControl = true;
+        targetY = -1;
+        targetX = -1;
+    }
+
 }
 
 void getCode() {
@@ -244,32 +312,39 @@ void getCode() {
     }
 }
 
-void copyMap() {
-    for (int i = 0; i < gameWidth; ++i) {
-        for (int j = 0; j < gameHeight; ++j) {
-            if (map[j + gameWidth * i] == '#')
-                map2[i][j] = '#';
-            else
-                map2[i][j] = '.';
-        }
+bool checkButton() {
+    bool res = false;
+    if (GetAsyncKeyState((int) 'W')) {
+        res = true;
     }
-    map2[gameWidth - 1][gameHeight / 2] = 'W';
+    return res;
 }
 
 void autoMove(float elapsedTime) {
-    if(abs(targetA - VectorA) >= 0.05){
+    if (abs(targetA - abs(VectorA)) > difference) {
         VectorA += (1.5f) * elapsedTime;
-    }
-    else{
-        if (abs(targetX - VectorX) >= 0.05 || abs(targetY - VectorY) >= 0.05) {
+    } else {
+        if (abs(targetX - VectorX) <= difference && abs(targetY - VectorY) <= difference) {
+            VectorX = targetX;
+            VectorY = targetY;
+            setTarget();
+        } else {
             VectorX += sinf(VectorA) * 5.0f * elapsedTime;
             VectorY += cosf(VectorA) * 5.0f * elapsedTime;
-        } else {
-            setTarget();
+            if (map[(int) VectorX * gameWidth + (int) VectorY] == '#') {
+                VectorX -= sinf(VectorA) * 5.0f * elapsedTime;
+                VectorY -= cosf(VectorA) * 5.0f * elapsedTime;
+                findWay();
+                setTarget();
+            }
         }
     }
-
-
+    if (targetX == -1 && targetY == -1) {
+        VectorX += sinf(VectorA) * 5.0f * elapsedTime;
+        VectorY += cosf(VectorA) * 5.0f * elapsedTime;
+    }
+    if (checkButton())
+        isManualControl = true;
 }
 
 int main() {
@@ -278,31 +353,41 @@ int main() {
     SetConsoleActiveScreenBuffer(Console);
     DWORD dwBytesWritten = 0;
 
-
-    generateMap();
-    copyMap();
+    generateMap2();
 
     auto tp1 = std::chrono::system_clock::now();
     auto tp2 = std::chrono::system_clock::now();
 
     while (true) {
-        tp2 = std::chrono::system_clock::now();//расчет разницы во времени для постепенного перемещения
-        std::chrono::duration<float> elapsedTime = tp2 - tp1;
-        tp1 = tp2;
-        float ElapsedTime = elapsedTime.count();
+        if (!isWin) {
+            tp2 = std::chrono::system_clock::now();//расчет разницы во времени для постепенного перемещения
+            std::chrono::duration<float> elapsedTime = tp2 - tp1;
+            tp1 = tp2;
+            float ElapsedTime = elapsedTime.count();
 
-        timer.update();
-        getCode();
+            timer.update();
+            getCode();
+            if (std::abs(VectorA) >= 6.28f)
+                VectorA = 0.0f;
 
-        if (isManualControl)
-            move(ElapsedTime);//движение
-        else
-            autoMove(ElapsedTime);
+            if (isManualControl)
+                move(ElapsedTime);//движение
+            else
+                autoMove(ElapsedTime);
 
-        rayCasting();
+            rayCasting();
 
-        minMap();//отрисовка миникарты
+            minMap();//отрисовка миникарты
+        } else {
+            std::string win = "YOU WIN";
+            for (int i = 0; i < win.size(); ++i) {
+                screen[2460 + i] = win[i];
+            }
+        }
 
+        if (map[(int) VectorX * gameWidth + (int) VectorY] == 'W') {
+            isWin = true;
+        }
         screen[ScreenWidth * ScreenHeight - 1] = '\0';
         WriteConsoleOutputCharacter(Console, reinterpret_cast<LPCSTR>(screen),
                                     ScreenWidth * ScreenHeight, {0, 0},
